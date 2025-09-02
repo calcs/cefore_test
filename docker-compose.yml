@@ -1,0 +1,18 @@
+services:
+  icn:
+    build: .
+    image: ceforesim:latest
+    environment:
+      CEFORE_DIR: /usr/local
+      USER: root
+      HOME: /root
+    volumes:
+      - ./app:/workspace/app
+    command: >
+      bash -lc '
+        printf "/usr/local/lib\n/usr/local/lib/cefore\n" > /etc/ld.so.conf.d/cefore.conf && ldconfig &&
+        cefnetdstop -F >/dev/null 2>&1 || true &&
+        cefnetdstart &&
+        tail -f /dev/null
+      '
+    tty: true
