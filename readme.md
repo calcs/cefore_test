@@ -8,12 +8,14 @@ producerの自動実行は行わないので、コンテナに入って手動起
 - 外のWebAPIをたたいているので、そこの通信許可
 
 ## ディレクトリ構成
+```
 cefore_test/  
 ├─ Dockerfile  
 ├─ docker-compose.yml  
 └─ app/  
    ├─ producer.py   # ICN Interest を受けて REST を呼び、Data で返す  
    └─ consumer.py   # ICN Interest を送って Data を受け取る  
+```
 
 app/ は /workspace/app としてマウントされる
 
