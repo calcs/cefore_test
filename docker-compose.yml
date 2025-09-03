@@ -8,6 +8,8 @@ services:
       HOME: /root
     volumes:
       - ./app:/workspace/app
+      - ./cefore-config/plugin.conf:/usr/local/cefore/plugin.conf:ro
+      - ./cefore-config/csmgrd.conf:/usr/local/cefore/csmgrd.conf:ro
     command: >
       bash -lc '
         printf "/usr/local/lib\n/usr/local/lib/cefore\n" > /etc/ld.so.conf.d/cefore.conf && ldconfig &&
@@ -21,10 +23,10 @@ services:
     image: ceforesim:latest   # 同じイメージを再利用（build は producer に任せる）
     environment:
       CEFORE_DIR: /usr/local
-      USER: root
-      HOME: /root
     volumes:
       - ./app:/workspace/app
+      - ./cefore-config/plugin.conf:/usr/local/cefore/plugin.conf:ro
+      - ./cefore-config/csmgrd.conf:/usr/local/cefore/csmgrd.conf:ro
     depends_on:
       - producer
     command: >

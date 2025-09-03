@@ -34,7 +34,8 @@ with cefpyco.create_handle(ceforedir=CEFOREDIR, portnum=PORT) as h:
             continue
         if info.is_interest and info.name.startswith(PREFIX):
             try:
-                payload = handle_interest(info.name)
+                # payload = handle_interest(info.name)
+                payload = json.dumps(random.randint(1, 1000)).encode("utf-8")
             except Exception as e:
                 payload = f'{{"error":"{e}"}}'.encode()
-            h.send_data(info.name, payload, info.chunk_num, cache_time=10)  #キャッシュ10秒
+            h.send_data(info.name, payload, info.chunk_num, expiry=10000, cache_time=100000)  #キャッシュ10秒
