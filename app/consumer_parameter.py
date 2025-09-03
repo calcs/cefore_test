@@ -1,11 +1,11 @@
-import os, json, base64, cefpyco
+import os, json, base64, cefpyco, random
 
 # urlsafeなbase64エンコードでないと、/や+が入ってしまい名前に使えない・・気がする
 def b64u(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).decode().rstrip("=")
 
 PREFIX = "ccnx:/api/param-test"
-params = {"lang": "ja", "limit": 500}
+params = {"lang": "ja", "limit": 0}
 
 blob = b64u(json.dumps(params, ensure_ascii=False).encode("utf-8"))
 name = f"{PREFIX}/__p/{blob}"

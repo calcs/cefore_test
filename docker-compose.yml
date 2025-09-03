@@ -1,5 +1,5 @@
 services:
-  icn:
+  producer:
     build: .
     image: ceforesim:latest
     environment:
@@ -13,6 +13,33 @@ services:
         printf "/usr/local/lib\n/usr/local/lib/cefore\n" > /etc/ld.so.conf.d/cefore.conf && ldconfig &&
         cefnetdstop -F >/dev/null 2>&1 || true &&
         cefnetdstart &&
+        tail -f /dev/null
+      '
+    tty: true
+
+  consumer:
+    image: ceforesim:latest   # 同じイメージを再利用（build は producer に任せる）
+    environment:
+      CEFORE_DIR: /usr/local
+      USER: root
+      HOME: /root
+    volumes:
+      - ./app:/workspace/app
+    depends_on:
+      - producer
+    command: >
+      bash -lc '
+        printf "/usr/local/lib\n/usr/local/lib/cefore\n" > /etc/ld.so.conf.d/cefore.conf && ldconfig &&
+        cefnetdstop -F >/dev/null 2>&1 || true &&
+        cefnetdstart;
+        # cefnetd が立ち上がるのを軽く待つ
+        for i in {1..10}; do cefstatus >/dev/null 2>&1 && break; sleep 0.3; done ;
+        # キャッシュ起動（失敗しても落とさない）
+        csmgrdstart >/dev/null 2>&1 || true ;
+        # producer の名前解決を軽く待つ（Docker 内DNS）
+        for i in {1..10}; do getent hosts producer >/dev/null 2>&1 && break; sleep 0.3; done ;
+        # ルート追加（失敗しても落とさない／次回再実行すればOK）
+        cefroute add ccnx:/api udp producer >/dev/null 2>&1 || true ;
         tail -f /dev/null
       '
     tty: true

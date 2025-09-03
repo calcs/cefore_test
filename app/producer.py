@@ -1,4 +1,4 @@
-import os, cefpyco, requests, base64, json
+import os, cefpyco, requests, base64, json, random
 
 PREFIX     = "ccnx:/api"
 PORT       = int(os.getenv("CEF_PORT", "9896"))
@@ -20,7 +20,7 @@ def handle_interest(name: str) -> bytes:
         r = requests.get("https://httpbin.org/get", timeout=5)
         return r.content
     elif name.startswith(f"{PREFIX}/param-test/"):
-        params["limit"] += 50;  # ちょっと弄ってみる
+        params["limit"] += random.randint(1, 100);  # ちょっと弄ってみる
         r = json.dumps(params).encode("utf-8")
         return r
     return b'{"error":"unsupported"}'
@@ -37,4 +37,4 @@ with cefpyco.create_handle(ceforedir=CEFOREDIR, portnum=PORT) as h:
                 payload = handle_interest(info.name)
             except Exception as e:
                 payload = f'{{"error":"{e}"}}'.encode()
-            h.send_data(info.name, payload, info.chunk_num, cache_time=0)
+            h.send_data(info.name, payload, info.chunk_num, cache_time=10)  #キャッシュ10秒
